@@ -4,6 +4,8 @@ import { useRouter } from 'vue-router';
 import { signUp } from '@/services/userService';
 import { checkValidation } from '@/services/validation';
 
+
+// 아래의 input쪽에 ref = fileInput 이걸로 아래의 변수에 주고값이 들어간다.
 const fileInput = ref(null)
 
 const router = useRouter();
@@ -24,6 +26,8 @@ const openFileSelector = () => {
   fileInput.value.click();
 }
 
+// 이벤트 객체가 항상들어오는데 쓸려면 아래처럼 e 를 이용해서 안의 데이터를 쓰면됨
+// java script 에서는 가능함 
 const handlePicChanged = e => {
   state.data.pic = e.target.files[0];
 }
@@ -83,7 +87,7 @@ const submit = async () => {
             id="uid"
             placeholder="아이디"
             v-model="state.data.uid"
-            not-null="true"
+           
             not-null-message="아이디는 필수로 입력하셔야 합니다."
             regexp="^[A-Za-z0-9_]{4,50}$"
             regexp-message="아이디는 영어, 숫자, 언더바로만 구성되어야 하며 4~50자까지 작성할 수 있습니다."
@@ -97,7 +101,7 @@ const submit = async () => {
             id="upw"
             placeholder="비밀번호"
             v-model="state.data.upw"
-            not-null="true"
+           
             not-null-message="비밀번호는 필수로 입력하셔야 합니다."
             regexp="^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&amp;*()_+\-=\[\]{};':&quot;\\|,.&lt;&gt;\/?])[A-Za-z\d!@#$%^&amp;*()_+\-=\[\]{};':&quot;\\|,.&lt;&gt;\/?]{5,}$"
             regexp-message="비밀번호는 영문자, 숫자, 특수기호로 구성되며 5자 이상이어야 합니다."
@@ -117,11 +121,11 @@ const submit = async () => {
         <div class="form-floating">
           <input
             type="text"
-            class="form-control"
+            class="form-control valid"
             id="nickName"
             placeholder="닉네임"
             v-model="state.data.nickName"
-            not-null="false"
+            
             regexp="^[가-힣]{2,10}$"
             regexp-message="닉네임은 한글로 2~10자까지 가능합니다."
             />
@@ -129,7 +133,8 @@ const submit = async () => {
         </div>
         <div>
           <select v-model="state.data.roles" multiple>
-            <option>유저1</option>
+            <!-- 아래는 하드 코딩 되어있는부분 back에서 데이터 가져와서 출력하면 된다. -->
+            <option>유저1</option> 
             <option>유저2</option>
             <option>관리자</option>
             <option>멘토</option>

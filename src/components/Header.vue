@@ -36,9 +36,11 @@ const saveFeed = () => {
 </script>
 
 <template>
+    <!-- 로그인 안되어있으면 안나오게  -->
 <header class="container py-3" v-if="authenticationStore.state.isSigned">
     <div id="globalConst">
         <div class="d-flex flex-column flex-md-row align-items-center">
+            <!-- flex-grow-1 다 똑같은 공간 할당 받음 -->
             <div class="d-inline-flex flex-grow-1 flex-shrink-0">
                 <router-link to="/"><img :src="logo" class="h24 w24" /></router-link>
             </div>
@@ -47,6 +49,7 @@ const saveFeed = () => {
                 <nav class="d-flex flex-grow-1 flex-column flex-md-row justify-content-end">
                     <div class="d-inline-flex me-3">
                         <a href="#" id="newFeedModalBtn" data-bs-toggle="modal" data-bs-target="#newFeedModal">
+                            <!-- svg + 버튼 보양 벡터방식 (계산식으로 그림을 그려서 꺠지지 않음)  -->
                             <svg aria-label="새로운 게시물"  class="_8-yf5" color="#262626" fill="#262626" height="24" role="img" viewBox="0 0 24 24" width="24">
                                 <path d="M2 12v3.45c0 2.849.698 4.005 1.606 4.944.94.909 2.098 1.608 4.946 1.608h6.896c2.848 0 4.006-.7 4.946-1.608C21.302 19.455 22 18.3 22 15.45V8.552c0-2.849-.698-4.006-1.606-4.945C19.454 2.7 18.296 2 15.448 2H8.552c-2.848 0-4.006.699-4.946 1.607C2.698 4.547 2 5.703 2 8.552z" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"  strokeWidth="2">
                                 </path>
@@ -62,6 +65,7 @@ const saveFeed = () => {
 
                     <div class="d-inline-flex dropdown">
                         <a href="#" role="button" id="navDropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false"  class="header_profile">
+                            <!-- 컴포넌트화 시킴 한두군데서 쓰인다 싶으면 다 컴포넌트 만들어버림 -->
                             <profile-img :userId="authenticationStore.state.signedUser.userId" :pic="authenticationStore.state.signedUser.pic" :size="24" :clsValue="`pointer profile`" />
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navDropdownMenuLink">
@@ -86,7 +90,7 @@ const saveFeed = () => {
             </div>
         </div>
     </div>
-
+<!-- 여기가 모달창 관련 구성해둔거  -->
     <div class="modal fade" id="newFeedModal" tabIndex="-1" aria-labelledby="newFeedModalLabel" aria-hidden="false">
         <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content" id="newFeedModalContent">
