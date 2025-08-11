@@ -11,6 +11,7 @@ const authenticationStore = useAuthenticationStore();
 
 const state = reactive({
     list: [],
+    isFinish : false,
     isLoading: false,
     feed: {
         location: '',
@@ -21,7 +22,7 @@ const state = reactive({
 
 const data = {
     page: 1,
-    rowPerPage: 20,
+    rowPerPage: 5,
 };
 
 onMounted(() => {
