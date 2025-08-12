@@ -42,7 +42,7 @@ const onPostComment = async () => {
     }
 
     const data = {
-        feedId: 0,
+        feedId: props.feedId,
         comment: state.comment
     }
 
