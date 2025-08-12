@@ -58,9 +58,11 @@ const getData = async () => {
   if (res.status === 200) {
     const result = res.data.result;
     if (result && result.length > 0) {
+      // 구조 분해 할당 
       state.list = [...state.list, ...result];
     }
     if (result.length < data.rowPerPage) {
+      // 결과값이 1페이지당 출력하는것 보다 작으면 더이상 데이터 안받아오게 false 처리하는것
       state.isFinish = true;
     }
   }
@@ -69,27 +71,37 @@ const getData = async () => {
 
 const handlePicChanged = (e) => {
   state.feed.pics = e.target.files;
+  // 여러개의 파일들이 저장 가능하도록
 };
 
 const saveFeed = async () => {
+  const MAX_PIC_COUNT = 10 ;
   console.log('state.feed.pics: ', state.feed.pics);
   //사진 있는지 확인
   if (state.feed.pics.length === 0) {
     alert('사진을 선택해 주세요.');
     return;
   }
+  else if ( state.feed.pics.length > 10)
+  {
+    alert (`사진은 ${MAX_PIC_COUNT}장 까지 선택 가능합니다.`);
+    return;
+  }
 
   const params = {
-    contents: state.feed.contents,
-    location: state.feed.location,
+    contents: state.feed.contents.length === 0 ? null : state.feed.contents,
+    location: state.feed.location.length === 0 ? null : state.feed.location,
   };
 
   const formData = new FormData();
+  // 아래도 백에서 req로 받는다고 해놔서 
   formData.append(
     'req',
     new Blob([JSON.stringify(params)], { type: 'application/json' })
   );
   for (let i = 0; i < state.feed.pics.length; i++) {
+    // 백에서 받는 이름을 pic을 pics라는 변수명으로 받는다고 설정 해놔서아래 처럼 
+    // pic 으로 데이터를 다넣는다
     formData.append('pic', state.feed.pics[i]);
   }
 
@@ -111,6 +123,7 @@ const saveFeed = async () => {
       },
     };
 
+    //배열 제일 앞에 넣겟다
     state.list.unshift(item);
 
     modalCloseButton.value.click(); //모달창 닫기
