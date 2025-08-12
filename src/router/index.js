@@ -41,6 +41,7 @@ router.beforeEach((to, from) => {
 
   if(unSignedPathList.includes(to.path) && authentcationStore.state.isSigned) {
     //로그인 상태에서 /sign-in, /sign-up 경로로 이동하려고 하면
+    // 로그인 상태에서 또 위의 경로 로 갈려고하면 막는거
     return { path: '/' }
   } else if(!authentcationStore.state.isSigned && !unSignedPathList.includes(to.path)) {
     console.log('로그아웃 상태에서 /sign-in, /sign-up 경로가 아닌 경우')

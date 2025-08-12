@@ -10,7 +10,7 @@ const router = useRouter();
 
 const state = reactive({
   data: {
-    nickName: '홍길동',
+    nickName: '테스트',
     uid: 'test',
     upw: 'test1!',
     chkUpw: 'test1!',
@@ -125,6 +125,7 @@ const submit = async () => {
           <label for="nickName" class="form-label">닉네임</label>
         </div>
         <div>
+        <!-- TODO : DB통신으로 인가 리스트 가져오기 -->
           <select v-model="state.data.roles" multiple>
             <option>유저1</option>
             <option>유저2</option>
