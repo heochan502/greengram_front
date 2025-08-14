@@ -2,11 +2,14 @@
 import FeedCommentCard from './FeedCommentCard.vue';
 import { reactive } from 'vue';
 import { postComment, getCommentList, deleteComment } from '@/services/feedCommentService';
+import { useAuthenticationStore } from '@/stores/authentication';
 
 const props = defineProps({
     feedId: Number,
     comments: Object
 });
+
+const authenticationStore = useAuthenticationStore();
 
 const state = reactive({
     isLoading: false,
@@ -34,6 +37,10 @@ const state = reactive({
     // ]
 });
 
+const data = {
+    rowPerPage: 5, 
+}
+
 //댓글 등록
 const onPostComment = async () => {
     if(state.comment.trim().length === 0) {
@@ -49,21 +56,41 @@ const onPostComment = async () => {
     const res = await postComment(data);
     if(res.status === 200) {
         const result = res.data.result;
+
+        const commentItem = {
+            feedCommentId: result,
+            writerUserId: authenticationStore.state.signedUser.userId,
+            writerNm: authenticationStore.state.signedUser.nickName,
+            writerPic: authenticationStore.state.signedUser.pic,            
+            comment: state.comment,
+            isSelf: true
+        }
+
+        state.commentList.push(commentItem);
+
+        state.comment = '';
     }
 }
 
 const getMoreComment = async () => {
+
+    //기존 자체 생성한 댓글은 삭제처리 
+    const commentList = state.commentList.filter(item => item.isSelf === undefined);
+    state.commentList = commentList;
+
     console.log('getMoreComment clicked');
     state.isLoading = true;
     const params = { 
         feed_id: props.feedId,
-        start_idx: state.commentList.length
+        start_idx: state.commentList.length,
+        size: data.rowPerPage
     }
     const res = await getCommentList(params)
     if(res.status === 200) {
-        const moreCommentList = res.data.result;
-        if(moreCommentList.length > 0) {
-            state.commentList = [...state.commentList, ...moreCommentList]
+        const result = res.data.result;
+        state.moreComment = result.moreComment;
+        if(result.commentList.length > 0) {
+            state.commentList.push(...result.commentList)
         }
     }
     state.isLoading = false;
@@ -77,7 +104,7 @@ const onDeleteComment = async (feedCommentId, idx) => {
     
     if(!confirm('댓글을 삭제하시겠습니까?')) { return; }
 
-    const params = { feedCommentId }
+    const params = { feed_comment_id : feedCommentId }
     
     const res = await deleteComment(params);
     if(res.status === 200) {    
