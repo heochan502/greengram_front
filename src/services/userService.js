@@ -19,3 +19,6 @@ export const getUserProfile = (params) =>
 
 export const patchUserProfilePic = (data) =>
   axios.patch(`${path}/profile/pic`, data).catch((e) => e.response);
+
+
+export const deleteUserProfilePic = () => axios.delete(`${path}/profile/pic`);

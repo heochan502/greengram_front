@@ -81,7 +81,7 @@ const toggleLike = async () => {
       </div>      
       <div v-if="props.ynDel && props.item.writerUserId === authenticationStore.state.signedUser.userId">
         <div className="d-flex flex-column justify-content-center">
-            <i className="fa fa-trash pointer color-red" @click="$emit('onDeleteFeed', props.item.feedId)"></i>
+            <i className="fa fa-trash pointer color-red" @click="$emit('onDeleteFeed')"></i>
         </div>
       </div>
     </div>
@@ -99,6 +99,7 @@ const toggleLike = async () => {
     </swiper>
     <div class="favCont p-2 d-flex flex-row">
       <i :class="`${state.isLike ? 'fas' : 'far'} fa-heart pointer rem1_2 me-3 color-red`" @click="toggleLike"></i>
+      <span> </span>
     </div>
     <div class="itemCtnt p-2" v-if="props.item.contents">{{ props.item.contents }}</div>
     <feed-comment-container :feed-id="props.item.feedId" :comments="props.item.comments" />

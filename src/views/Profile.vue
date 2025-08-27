@@ -5,9 +5,9 @@ import FeedCard from '@/components/FeedCard.vue';
 import { ref, reactive, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter, onBeforeRouteUpdate } from 'vue-router';
 import { useAuthenticationStore } from '@/stores/authentication';
-import { getUserProfile, patchUserProfilePic } from '@/services/userService';
+import { getUserProfile, patchUserProfilePic, deleteUserProfilePic  } from '@/services/userService';
 import { postUserFollow, deleteUserFollow } from '@/services/followService';
-import { getFeedList } from '@/services/feedService';
+import { getFeedList , deleteFeed} from '@/services/feedService';
 import { bindEvent } from '@/utils/commonUtils';
 
 const fileInput = ref(null);
@@ -54,7 +54,7 @@ const init = userId => {
         followingCount: 0,
         followState: 0
     }
-    state.list = []
+    state.list = [];
 
     data.page = 1;
     data.profileUserId = userId;
@@ -118,8 +118,30 @@ const getFeedData = async () => {
     state.isLoading = false;
 }
 
-const removeUserPic = () => {
+const removeUserPic = async () => {
+
     console.log('프로파일 이미지 삭제');
+    const res = await deleteUserProfilePic();
+    if(res.status === 200) {
+        state.userProfile.pic = null;
+        authenticationStore.setSigndUserPic(null);
+    }    
+}
+
+//피드 삭제
+const doDeleteFeed = async (feedId, idx) => {
+    if(!confirm('삭제하시겠습니까?')){
+        return;
+    }
+    console.log('feedId:', feedId);
+    console.log('idx', idx);
+   
+    const params ={'feed_id': feedId};
+    const res = await deleteFeed(params);
+    if (res.status === 200)
+    {
+        state.list.splice(idx,1);
+    }
 }
 
 const onClickProfileImg = () => {
@@ -249,7 +271,7 @@ onBeforeRouteUpdate((to, from) => {
             </div>
 
             <div class="item_container mt-3">
-                <feed-card v-for="item in state.list" :key="item.feedId" :item="item"></feed-card>
+                <feed-card v-for="(item, idx) in state.list" :key="item.feedId" :item="item"  :yn-del="true" @on-delete-feed="doDeleteFeed(item.feedId, idx)"></feed-card>
             </div>
 
             <div class="loading display-none" v-if="state.isLoading">
