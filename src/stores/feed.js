@@ -1,11 +1,29 @@
-import { reactive } from 'vue'
+import { reactive, computed } from 'vue'
 import { defineStore } from 'pinia'
 
 export const useFeedStore = defineStore('feed', 
     () => {
         const state = reactive({
-            feedList: []
+            rowPerPage: 20,
+            feedList: [],
+            page: 1,            
+            profileUserId: '',
+            keyword: '',
+            reLoading: false
         })
+
+        const setPage = page => state.page = page;
+        const setProfileUserId = userId => state.profileUserId = userId;
+        const setKeyword = keyword => state.keyword = keyword;
+        const setReLoading = reLoading => state.reLoading = reLoading;
+
+        const init = () => {
+            state.feedList = []
+            state.page = 1;
+            state.profileUserId = '';
+            state.keyword = '';
+            state.reLoading = false;
+        }
 
         const addFeedList = list => {
             state.feedList.push(...list);
@@ -15,6 +33,38 @@ export const useFeedStore = defineStore('feed',
             state.feedList.unshift(item);
         }
 
-        return { state, addFeedList, addFeedUnshift };
+        const deleteFeedByIdx = idx => {
+            state.feedList.splice(idx, 1)
+        }
+
+        const clearList = () => {
+            state.feedList = [];
+            // state.profileUserId = '';
+        }
+
+        const feedList = computed(() => state.feedList )
+
+        const page = computed( () => state.page );
+        const rowPerPage = computed( () => state.rowPerPage );
+        const profileUserId = computed( () => state.profileUserId );
+        const keyword = computed( () => state.keyword );
+        const reLoading = computed( () => state.reLoading );
+
+        return { feedList
+                , page
+                , rowPerPage
+                , profileUserId
+                , keyword
+                , reLoading
+                , setPage
+                , setProfileUserId
+                , setKeyword
+                , setReLoading
+                , init
+                , addFeedList
+                , addFeedUnshift
+                , deleteFeedByIdx
+                , clearList 
+                };
     }
 )

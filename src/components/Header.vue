@@ -1,30 +1,89 @@
 <script setup>
+
 import logo from '@/assets/logo.png';
 import ProfileImg from './ProfileImg.vue';
 import { useAuthenticationStore } from '@/stores/authentication';
 import { signOut } from '@/services/userService';
+import { reactive, watch } from 'vue';
+import { getKeywordList, getFeedList } from '@/services/feedService';
+import { useFeedStore } from '@/stores/feed';
+import { useRoute } from 'vue-router';
 
+const route = useRoute();
+
+const feedStore = useFeedStore();
 const authenticationStore = useAuthenticationStore();
+
+const state = reactive({
+    search: '',
+    searchList: []
+})
+
+watch(()=> route.fullPath, ()=>{
+state.search='';
+});
+
 
 const doSignOut = async () => {    
     const res = await signOut();
     if(res.status === 200) {
         await authenticationStore.signOut()
+
+        //window.location.href = 'https://kauth.kakao.com/oauth/logout?client_id=23cc7564b5c5007c60f5088a24f32fbe&logout_redirect_uri=http://localhost:5173/sign-in';        
     }
+}
+
+let debounceTimer = null;
+const onTyping = () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+        console.log('검색');
+        getSearchKeyword();
+    }, 400);
+}
+
+const getSearchKeyword = async () => {
+    state.searchList = [];
+    if(!state.search) { return; }
+
+    const params = {
+        keyword: state.search
+    }
+    const res = await getKeywordList(params);
+    if(res.status === 200) {
+        const data = res.data.result;
+        state.searchList = data;
+    }
+}
+
+const getFeedData = async () => {
+
+
+    feedStore.setKeyword(state.search);
+    feedStore.clearList();
+    feedStore.setPage(1);
+    feedStore.setReLoading(true);
+
 }
 </script>
 
-<template>
+<template>    
 <header class="container py-3" v-if="authenticationStore.state.isSigned">
     <div id="globalConst">
         <div class="d-flex flex-column flex-md-row align-items-center">
             <div class="d-inline-flex flex-grow-1 flex-shrink-0">
-                <router-link to="/"><img :src="logo" class="h24 w24" /></router-link>
+                <router-link to="/" ><img :src="logo" class="h24 w24" /></router-link>
             </div>
-            <div class="d-inline-flex flex-grow-1 flex-shrink-0"></div>
+            <div class="d-inline-flex flex-grow-1 flex-shrink-0">
+                <b-form-input list="search-list-id" @input="onTyping" @keyup.enter="getFeedData" v-model="state.search"/>
+                <datalist id="search-list-id">                    
+                    <option v-for="item in state.searchList">{{ item }}</option>
+                </datalist>
+                <b-button variant="outline-secondary" class="ms-3" size="sm" @click="getFeedData">Search</b-button>
+            </div>
             <div class="d-inline-flex flex-grow-1 flex-shrink-0">
                 <nav class="d-flex flex-grow-1 flex-column flex-md-row justify-content-end">
-                    <div class="d-inline-flex me-3">
+                    <div class="d-inline-flex">
                         <a href="#" id="newFeedModalBtn" data-bs-toggle="modal" data-bs-target="#newFeedModal">
                             <svg aria-label="새로운 게시물"  class="_8-yf5" color="#262626" fill="#262626" height="24" role="img" viewBox="0 0 24 24" width="24">
                                 <path d="M2 12v3.45c0 2.849.698 4.005 1.606 4.944.94.909 2.098 1.608 4.946 1.608h6.896c2.848 0 4.006-.7 4.946-1.608C21.302 19.455 22 18.3 22 15.45V8.552c0-2.849-.698-4.006-1.606-4.945C19.454 2.7 18.296 2 15.448 2H8.552c-2.848 0-4.006.699-4.946 1.607C2.698 4.547 2 5.703 2 8.552z" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"  strokeWidth="2">
@@ -36,16 +95,13 @@ const doSignOut = async () => {
                             </svg>
                         </a>
                     </div>
-
-                    <div class="d-inline-flex me-3"></div>
-
                     <div class="d-inline-flex dropdown">
                         <a href="#" role="button" id="navDropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false"  class="header_profile">
                             <profile-img :userId="authenticationStore.state.signedUser.userId" :pic="authenticationStore.state.signedUser.pic" :size="24" :clsValue="'pointer profile'" />
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navDropdownMenuLink">
                             <li>
-                                <router-link :to="`/profile/${authenticationStore.state.signedUser.userId}`">                      
+                                <router-link :to="`/profile/${authenticationStore.state.signedUser.userId}`" @click="getFeedData('')">                      
                                     <span class="dropdown-item">
                                         <span>
                                             <svg aria-label="프로필"  class="_8-yf5 " color="#262626" fill="#262626" height="16" role="img" viewBox="0 0 24 24" width="16">
@@ -71,5 +127,6 @@ const doSignOut = async () => {
 </template>
 
 <style scoped>
-a { text-decoration: none; color: black; }
+
+nav { align-items: center; gap: 20px; }
 </style>

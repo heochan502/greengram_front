@@ -8,11 +8,9 @@ import { checkValidation } from '@/utils/validation';
 const router = useRouter();
 
 const authentication = useAuthenticationStore();
-
 const beBaseUrl = import.meta.env.VITE_BASE_URL;
-const feBaseUrl = window.location.origin; // localhost:5173 값이 넘어온다
+const feBaseUrl = window.location.origin;
 const redirectUrl = `${feBaseUrl}/fe/redirect`;
-
 
 const state = reactive({
   form: {
@@ -23,9 +21,7 @@ const state = reactive({
 
 const submit = async () => {
   //유효성 체크
-  if (checkValidation()) {
-    return;
-  }
+  if (checkValidation()) { return; }
 
   const res = await signIn(state.form);
   console.log('Login.vue - submit() - res: ', res);
@@ -36,6 +32,7 @@ const submit = async () => {
     await router.push('/');
   }
 };
+
 </script>
 
 <template>
@@ -71,11 +68,7 @@ const submit = async () => {
         </div>
         <button class="w-100 h6 btn py-3 btn-primary">로그인</button>
       </form>
-      <div class ="mb-3">
-        <span class=""pointer> <a :href= "``"> </a></span>
-
-      </div>
-      <div>
+      <div class="mb-3">
         <span class="pointer"><a :href="`${beBaseUrl}/oauth2/authorization/naver?redirect_uri=${redirectUrl}`">네이버</a></span>        
         <span class="pointer"><a :href="`${beBaseUrl}/oauth2/authorization/kakao?redirect_uri=${redirectUrl}`">카카오</a></span>        
       </div>

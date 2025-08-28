@@ -1,7 +1,7 @@
-import axios from "axios";
-import { reissue } from "@/services/userService";
-import { useAuthenticationStore } from "@/stores/authentication";
-import { useMessageModalStore } from "@/stores/messageModal";
+import axios from 'axios';
+import { reissue } from '@/services/userService';
+import { useAuthenticationStore } from '@/stores/authentication';
+import { useMessageModalStore } from '@/stores/messageModal';
 
 axios.defaults.baseURL = `${import.meta.env.VITE_BASE_URL}/api/`;
 axios.defaults.withCredentials = true;
@@ -11,16 +11,13 @@ axios.interceptors.response.use(
     return res;
   },
   async (err) => {
-    console.log("err: ", err);
+    console.log('err: ', err);
     if (err.response) {
-      console.log("err.response : ", err.response);
+      console.log('err.response : ', err.response);
       const authenticationStore = useAuthenticationStore();
-      if (err.config.url === "/user/reissue" && err.response.status === 500) {
+      if (err.config.url === '/user/reissue' && err.response.status === 500) {
         authenticationStore.signOut();
-      } else if (
-        err.response.status === 401 &&
-        authenticationStore.state.isSigned
-      ) {
+      } else if (err.response.status === 401 && authenticationStore.state.isSigned) {
         //401 UnAuthorized 에러인데 FE 로그인 처리 되어 있다면
 
         await reissue(); //AccessToken 재발행 시도
